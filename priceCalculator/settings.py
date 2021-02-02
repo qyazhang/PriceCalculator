@@ -25,7 +25,7 @@ SECRET_KEY = '1c6*w7id-78&bgq-1jkr_@mo3am3ki&gc0jw_%n&jtm)o5*n=o'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['agonize.asuscomm.com']
+ALLOWED_HOSTS = ['agonize.asuscomm.com', '0.0.0.0', 'localhost', '127.0.0.1']
 
 
 # Application definition
