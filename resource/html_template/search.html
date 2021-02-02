@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>煤炉价格计算器</title>
+</head>
+<body>
+    <b>请输入煤炉商品网址</b>
+    <form action="/get" method="get">
+        <input type="text" name="url" />
+        <input type="submit" value="搜索" />
+    </form>
+    <h1>价格为</h1>
+    <h1>{{ result }}({{ shipping_fee_tag }})</h1>
+    <h1>{{ item_name }}</h1>
+    <img src="{{ img_url }}">
+</body>
+</html>
