@@ -4,7 +4,7 @@ import requests
 import re
 import time
 import json
-
+import validators
 
 def calculatePrice(request):
     context = {}
@@ -12,7 +12,18 @@ def calculatePrice(request):
         return redirect('/index', context)
         
     url = request.GET['url']
+    if not url.startswith("https://www.mercari.com/jp/"):
+        print("invalid mercari item page")
+        return redirect('/index', context)
+
+    if not (validators.url(url)):
+        print("input is not valid url")
+        return redirect('/index', context)
+
     item_name, img_url, formatted_price, shipping_fee_tag = parseMercariFormattedPrice(url)
+    if (item_name is None or img_url is None or formatted_price is None or shipping_fee_tag is None):
+        print("failed to parse webpage")
+        return redirect('/index', context)
 
     pay_rate = getCurrencyRate()
 
@@ -83,7 +94,5 @@ def getCurrencyRate():
     jpy_currency = currency_data["data"]["rates"]["JPY"]
     cny_currency = currency_data["data"]["rates"]["CNY"]
     original_rate = 100 / (jpy_currency / cny_currency)
-    print(original_rate)
     pay_rate = round(original_rate + 0.8, 1)
-    print(pay_rate)
     return pay_rate
