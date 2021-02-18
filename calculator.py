@@ -12,15 +12,26 @@ def calculatePrice(request):
         return redirect('/index', context)
         
     url = request.GET['url']
-    if not url.startswith("https://www.mercari.com/jp/"):
-        print("invalid mercari item page")
+    print("ready to parse url: " + url)
+    if not url.startswith("https://www.mercari.com/jp/items/") and not url.startswith("https://item.mercari.com/jp/") :
+        print("invalid mercari item page: " + url)
         return redirect('/index', context)
 
     if not (validators.url(url)):
-        print("input is not valid url")
+        print("input is not valid url: " + url)
         return redirect('/index', context)
 
-    item_name, img_url, formatted_price, shipping_fee_tag = parseMercariFormattedPrice(url)
+    session = HTMLSession()
+    page = session.get(url)
+
+    item_name, img_url = parseMercariMetadata(page)
+    if (item_name is None or img_url is None):
+        print("failed to parse webpage, maybe url is wrong")
+        return redirect('/index', context)
+    else:
+        print("Get item: " + item_name.text)
+
+    formatted_price, shipping_fee_tag = parseMercariFormattedPrice(page)
     if (item_name is None or img_url is None or formatted_price is None or shipping_fee_tag is None):
         print("failed to parse webpage")
         return redirect('/index', context)
@@ -39,22 +50,17 @@ def calculatePrice(request):
     formatted_final_price_cny = int(final_price_cny + 1)
 
     context['result'] = f"¥{formatted_final_price_cny}"
-    context['item_name'] = item_name
-    context['img_url'] = img_url
+    context['item_name'] = item_name.text
+    context['img_url'] = img_url.attrs['data-src']
     context['shipping_fee_tag'] = shipping_fee_tag
     return render(request, 'search.html', context)
 
 
-def parseMercariFormattedPrice(mercariUrl):
-    session = HTMLSession()
-    page = session.get(mercariUrl)
+def parseMercariFormattedPrice(page):
     price = page.html.xpath(
         "//span[@class='item-price bold']", first=True).text
     item_type = page.html.xpath(
         "//span[@class='item-shipping-fee']", first=True).text
-    item_name = page.html.xpath("//h1[@class='item-name']", first=True).text
-    img_url = page.html.xpath(
-        "//span[@class='luminous-gallery']", first=True).attrs['data-src']
 
     if (item_type == "送料込み"):
         shipping_fee_tag = "含岛内运费"
@@ -62,7 +68,14 @@ def parseMercariFormattedPrice(mercariUrl):
         shipping_fee_tag = "不含岛内运费"
 
     formatted_price = re.sub('\D', '', price)
-    return item_name, img_url, int(formatted_price), shipping_fee_tag
+    return int(formatted_price), shipping_fee_tag
+
+def parseMercariMetadata(page):
+    item_name = page.html.xpath("//h1[@class='item-name']", first=True)
+    img_url = page.html.xpath(
+        "//span[@class='luminous-gallery']", first=True)
+
+    return item_name, img_url
 
 
 def getCurrencyRate():
