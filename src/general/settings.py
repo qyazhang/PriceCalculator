@@ -49,7 +49,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'priceCalculator.urls'
+ROOT_URLCONF = 'src.general.urls'
 
 TEMPLATES = [
     {
@@ -67,7 +67,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'priceCalculator.wsgi.application'
+WSGI_APPLICATION = 'src.general.wsgi.application'
 
 
 # Database
