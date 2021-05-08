@@ -3,16 +3,10 @@ from django.shortcuts import render, redirect
 import requests
 import re
 import time
-import json
 import validators
+import src.utils.calculatorUtils as calculatorUtils
 
-def calculatePrice(request):
-    context = {}
-    if (request.GET['url'] == None or request.GET['url'] == ''):
-        return redirect('/index', context)
-        
-    url = request.GET['url']
-    print("ready to parse url: " + url)
+def calculateMercariPrice(url, context):
     if not url.startswith("https://www.mercari.com/jp/items/") and not url.startswith("https://item.mercari.com/jp/") :
         print("invalid mercari item page: " + url)
         return redirect('/index', context)
@@ -36,7 +30,7 @@ def calculatePrice(request):
         print("failed to parse webpage")
         return redirect('/index', context)
 
-    pay_rate = getCurrencyRate()
+    pay_rate = calculatorUtils.getCurrencyRate()
 
     final_price_jpy = formatted_price
     if (formatted_price < 900):
@@ -76,36 +70,3 @@ def parseMercariMetadata(page):
         "//span[@class='luminous-gallery']", first=True)
 
     return item_name, img_url
-
-
-def getCurrencyRate():
-    with open("./resource/currency.json", "r") as currency_file:
-        currency_text = currency_file.read()
-        currency_data = json.loads(currency_text)
-
-    with open("./resource/config.json", "r") as config_file:
-        config_text = config_file.read()
-        config_data = json.loads(config_text)
-        key = config_data["fixer"]["key"]
-
-    last_modify_time = currency_data["lastModifyTime"]
-    current_time = time.time()
-    if (float(current_time) - float(last_modify_time) > 3600):
-        currency_data["lastModifyTime"] = current_time
-
-        currency_response = requests.get(
-            'http://data.fixer.io/api/latest?access_key=' + key + '&format=1')
-        currency_res = currency_response.json()
-        print(currency_res)
-        if (currency_res["success"] == False):
-            print("error to update currency")
-        else:
-            currency_data["data"] = currency_res
-            with open("./resource/currency.json", "w") as currency_file:
-                json.dump(currency_data, currency_file)
-
-    jpy_currency = currency_data["data"]["rates"]["JPY"]
-    cny_currency = currency_data["data"]["rates"]["CNY"]
-    original_rate = 100 / (jpy_currency / cny_currency)
-    pay_rate = round(original_rate + 0.8, 1)
-    return pay_rate
