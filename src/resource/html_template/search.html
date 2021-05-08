@@ -2,14 +2,15 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>煤炉价格计算器</title>
+<title>价格计算器</title>
 </head>
 <body>
-    <b>请输入煤炉商品网址</b>
+    <b>请输入商品网址（支持网站：煤炉，otamart）</b>
     <form action="/get" method="get">
         <input type="text" name="url" />
         <input type="submit" value="搜索" />
     </form>
+    <h1>是否已售出：{{ sold_out_flag }}</h1>
     <h1>价格为</h1>
     <h1>{{ result }}({{ shipping_fee_tag }})</h1>
     <h1>{{ item_name }}</h1>

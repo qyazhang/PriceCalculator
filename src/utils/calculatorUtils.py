@@ -1,11 +1,13 @@
 import json
+import time
+import requests
 
 def getCurrencyRate():
-    with open("./resource/currency.json", "r") as currency_file:
+    with open("./src/resource/currency.json", "r") as currency_file:
         currency_text = currency_file.read()
         currency_data = json.loads(currency_text)
 
-    with open("./resource/config.json", "r") as config_file:
+    with open("./src/resource/config.json", "r") as config_file:
         config_text = config_file.read()
         config_data = json.loads(config_text)
         key = config_data["fixer"]["key"]
@@ -23,7 +25,7 @@ def getCurrencyRate():
             print("error to update currency")
         else:
             currency_data["data"] = currency_res
-            with open("./resource/currency.json", "w") as currency_file:
+            with open("./src/resource/currency.json", "w") as currency_file:
                 json.dump(currency_data, currency_file)
 
     jpy_currency = currency_data["data"]["rates"]["JPY"]
@@ -31,3 +33,17 @@ def getCurrencyRate():
     original_rate = 100 / (jpy_currency / cny_currency)
     pay_rate = round(original_rate + 0.8, 1)
     return pay_rate
+
+def calculateFinalCNYPrice(formatted_price):
+    pay_rate = getCurrencyRate()
+
+    final_price_jpy = formatted_price
+    if (formatted_price < 900):
+        final_price_jpy += 100
+    elif(formatted_price >= 900 and formatted_price < 1000):
+        final_price_jpy = 1000
+    else:
+        final_price_jpy = final_price_jpy
+
+    final_price_cny = final_price_jpy / 100 * pay_rate
+    return int(final_price_cny + 1)
