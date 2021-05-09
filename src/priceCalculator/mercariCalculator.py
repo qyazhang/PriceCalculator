@@ -25,14 +25,15 @@ def calculateMercariPrice(request, url, context):
     else:
         print("Get item: " + item_name.text)
 
-    formatted_price, shipping_fee_tag, sold_out_flag = parseMercariFormattedPrice(page)
-    if (item_name is None or img_url is None or formatted_price is None or shipping_fee_tag is None):
+    formatted_price_jpy, shipping_fee_tag, sold_out_flag = parseMercariFormattedPrice(page)
+    if (item_name is None or img_url is None or formatted_price_jpy is None or shipping_fee_tag is None):
         print("failed to parse webpage")
         return redirect('/index', context)
 
-    formatted_final_price_cny = calculatorUtils.calculateFinalCNYPrice(formatted_price)
+    formatted_final_price_cny = calculatorUtils.calculateFinalCNYPrice(formatted_price_jpy)
 
-    context['result'] = f"¥{formatted_final_price_cny}"
+    context['price_jpy'] = f"¥{formatted_price_jpy}"
+    context['price_cny'] = f"¥{formatted_final_price_cny}"
     context['item_name'] = item_name.text
     context['img_url'] = img_url.attrs['data-src']
     context['shipping_fee_tag'] = shipping_fee_tag
