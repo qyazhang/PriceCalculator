@@ -5,15 +5,17 @@ import re
 import time
 import validators
 import src.utils.calculatorUtils as calculatorUtils
+from .itemModel import ItemModel
 
-def calculateMercariPrice(request, url, context):
+def calculateMercariPrice(request, url):
+    model = ItemModel()
     if not url.startswith("https://www.mercari.com/jp/items/") and not url.startswith("https://item.mercari.com/jp/") :
         print("invalid mercari item page: " + url)
-        return redirect('/index', context)
+        return model
 
     if not (validators.url(url)):
         print("input is not valid url: " + url)
-        return redirect('/index', context)
+        return model
 
     session = HTMLSession()
     page = session.get(url)
@@ -21,24 +23,25 @@ def calculateMercariPrice(request, url, context):
     item_name, img_url = parseMercariMetadata(page)
     if (item_name is None or img_url is None):
         print("failed to parse webpage, maybe url is wrong")
-        return redirect('/index', context)
+        return model
     else:
         print("Get item: " + item_name.text)
 
     formatted_price_jpy, shipping_fee_tag, sold_out_flag = parseMercariFormattedPrice(page)
     if (item_name is None or img_url is None or formatted_price_jpy is None or shipping_fee_tag is None):
         print("failed to parse webpage")
-        return redirect('/index', context)
+        return model
 
     formatted_final_price_cny = calculatorUtils.calculateFinalCNYPrice(formatted_price_jpy)
 
-    context['price_jpy'] = f"¥{formatted_price_jpy}"
-    context['price_cny'] = f"¥{formatted_final_price_cny}"
-    context['item_name'] = item_name.text
-    context['img_url'] = img_url.attrs['data-src']
-    context['shipping_fee_tag'] = shipping_fee_tag
-    context['sold_out_flag'] = "是" if sold_out_flag else "否"
-    return render(request, 'search.html', context)
+
+    model.price_jpy = f"¥{formatted_price_jpy}"
+    model.price_cny = f"¥{formatted_final_price_cny}"
+    model.item_name = item_name.text
+    model.img_url = img_url.attrs['data-src']
+    model.shipping_fee_tag = shipping_fee_tag
+    model.sold_out_flag = sold_out_flag
+    return model
 
 
 def parseMercariFormattedPrice(page):

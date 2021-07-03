@@ -5,16 +5,19 @@ import re
 import time
 import validators
 import src.utils.calculatorUtils as calculatorUtils
+from .itemModel import ItemModel
 
-def calculateOtamartPrice(request, url, context):
+def calculateOtamartPrice(request, url):
+    model = ItemModel()
+
     if not url.startswith("https://otamart.com/items/"):
     # and not url.startswith("https://item.mercari.com/jp/") :
         print("invalid otamart item page: " + url)
-        return redirect('/index', context)
+        return model
 
     if not (validators.url(url)):
         print("input is not valid url: " + url)
-        return redirect('/index', context)
+        return model
 
     session = HTMLSession()
     page = session.get(url)
@@ -22,23 +25,24 @@ def calculateOtamartPrice(request, url, context):
     item_name, img_url = parseOtamartMetadata(page)
     if (item_name is None or img_url is None):
         print("failed to parse webpage, maybe url is wrong")
-        return redirect('/index', context)
+        return model
     else:
         print("Get item: " + item_name.text)
 
-    formatted_price, shipping_fee_tag, sold_out_flag = parseOtamartFormattedPrice(page)
-    if (item_name is None or img_url is None or formatted_price is None or shipping_fee_tag is None):
+    formatted_price_jpy, shipping_fee_tag, sold_out_flag = parseOtamartFormattedPrice(page)
+    if (item_name is None or img_url is None or formatted_price_jpy is None or shipping_fee_tag is None):
         print("failed to parse webpage")
-        return redirect('/index', context)
+        return model
 
-    formatted_final_price_cny = calculatorUtils.calculateFinalCNYPrice(formatted_price)
+    formatted_final_price_cny = calculatorUtils.calculateFinalCNYPrice(formatted_price_jpy)
 
-    context['result'] = f"¥{formatted_final_price_cny}"
-    context['item_name'] = item_name.text
-    context['img_url'] = img_url.attrs['src']
-    context['shipping_fee_tag'] = shipping_fee_tag
-    context['sold_out_flag'] = "是" if sold_out_flag else "否"
-    return render(request, 'search.html', context)
+    model.price_jpy = f"¥{formatted_price_jpy}"
+    model.price_cny = f"¥{formatted_final_price_cny}"
+    model.item_name = item_name.text
+    model.img_url = img_url.attrs['src']
+    model.shipping_fee_tag = shipping_fee_tag
+    model.sold_out_flag = sold_out_flag
+    return model
 
 
 def parseOtamartFormattedPrice(page):
