@@ -126,5 +126,10 @@ STATIC_URL = '/static/'
 
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000"
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://0.0.0.0:3000",
+    "http://0.0.0.0:3001",
+    "http://0.0.0.0:8001",
+    "http://agonize.asuscomm.com:8000"
 ]
