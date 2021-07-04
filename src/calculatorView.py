@@ -16,11 +16,11 @@ def get_item(request):
         if "mercari.com" in url:
             item = mercariCalculator.calculateMercariPrice(request, url)
             item_serizalizer = ItemModelSerializer(item)
-            return JsonResponse(item_serizalizer.data)
+            return JsonResponse(item_serizalizer.data, status=status.HTTP_200_OK, content_type="application/json")
         if "otamart.com" in url:
             item = otamartCalculator.calculateOtamartPrice(request, url)
             item_serizalizer = ItemModelSerializer(item)
-            return JsonResponse(item_serizalizer.data)
+            return JsonResponse(item_serizalizer.data, status=status.HTTP_200_OK, content_type="application/json")
         else:
             return JsonResponse({'status': 'details'}, status=status.HTTP_404_NOT_FOUND)
     else:
