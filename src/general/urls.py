@@ -14,9 +14,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.conf.urls import url
-import src.calculatorFactory as calculator, src.search as search
+import src.calculatorView as calculatorView
 
 urlpatterns = [
-    url(r'^index', search.get_html),
-    url(r'^get', calculator.calculatePrice)
+    url(r'^api/item', calculatorView.get_item)
 ]
