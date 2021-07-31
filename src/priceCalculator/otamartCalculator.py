@@ -56,9 +56,9 @@ def parseOtamartFormattedPrice(page):
             contain_delivery_fee_flag = True
 
     if (contain_delivery_fee_flag):
-        shipping_fee_tag = "含岛内运费"
+        shipping_fee_tag = True
     else:
-        shipping_fee_tag = "不含岛内运费"
+        shipping_fee_tag = False
 
     sold_out_element = page.html.xpath(
         "//div[@class='sold-out-message']/p", first=True)

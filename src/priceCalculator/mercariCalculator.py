@@ -53,9 +53,9 @@ def parseMercariFormattedPrice(page):
         "//div[@class='item-buy-btn disabled']", first=True)
 
     if (item_type == "送料込み"):
-        shipping_fee_tag = "含岛内运费"
+        shipping_fee_tag = True
     else:
-        shipping_fee_tag = "不含岛内运费"
+        shipping_fee_tag = False
 
     formatted_price = re.sub('\D', '', price)
 

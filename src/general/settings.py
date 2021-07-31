@@ -130,6 +130,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3001",
     "http://0.0.0.0:3000",
     "http://0.0.0.0:3001",
+    "http://0.0.0.0:8000",
     "http://0.0.0.0:8001",
-    "http://agonize.asuscomm.com:8000"
+    "http://agonize.asuscomm.com:8000",
+    "http://agonize.asuscomm.com:3000"
 ]
