@@ -8,3 +8,8 @@ services:
       - .:/code
     ports:
       - "8001:8001"
+
+  selenium:
+    image: selenium/standalone-chrome
+    ports:
+    - 4444:4444
