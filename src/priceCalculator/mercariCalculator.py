@@ -17,11 +17,7 @@ def calculateMercariPrice(request, url):
         print("input is not valid url: " + url)
         return model
 
-<<<<<<< HEAD
-    driver = webdriver.Remote("http://0.0.0.0:4444/wd/hub", DesiredCapabilities.CHROME)
-=======
     driver = webdriver.Remote("http://selenium:4444/wd/hub", DesiredCapabilities.CHROME)
->>>>>>> 7cc4a3aa5b284608b98e1a23d95c37cb00f37864
     driver.get(url)
     time.sleep(1)
 
