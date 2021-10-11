@@ -5,6 +5,7 @@ import src.utils.calculatorUtils as calculatorUtils
 from .itemModel import ItemModel
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 def calculateMercariPrice(request, url):
     model = ItemModel()
@@ -16,10 +17,7 @@ def calculateMercariPrice(request, url):
         print("input is not valid url: " + url)
         return model
 
-    driver_exe = 'chromedriver'
-    options = Options()
-    options.add_argument("--headless")
-    driver = webdriver.Chrome(driver_exe, options=options)
+    driver = webdriver.Remote("http://127.0.0.1:4444/wd/hub", DesiredCapabilities.CHROME)
     driver.get(url)
     time.sleep(1)
 
