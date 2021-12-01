@@ -38,6 +38,8 @@ def calculateMercariPrice(request, url):
         print("failed to parse webpage")
         return model
 
+    driver.quit()
+
     formatted_final_price_cny = calculatorUtils.calculateFinalCNYPrice(formatted_price_jpy)
 
     model.price_jpy = f"¥{formatted_price_jpy}"
