@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class ItemModel(models.Model):
     @property
     def price_jpy(self):

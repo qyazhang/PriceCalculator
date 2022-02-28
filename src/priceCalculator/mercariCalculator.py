@@ -7,6 +7,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
+
 def calculateMercariPrice(request, url):
     model = ItemModel()
     if not url.startswith("https://www.mercari.com/jp/items/") and not url.startswith("https://item.mercari.com/jp/") and not url.startswith("https://jp.mercari.com/item/"):
@@ -22,7 +23,8 @@ def calculateMercariPrice(request, url):
     chrome_options.add_argument('--window-size=1420,1080')
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--disable-gpu')
-    driver = webdriver.Remote("http://selenium:4444/wd/hub", options=chrome_options)
+    driver = webdriver.Remote(
+        "http://selenium:4444/wd/hub", options=chrome_options)
     driver.get(url)
     time.sleep(1)
 
@@ -33,14 +35,16 @@ def calculateMercariPrice(request, url):
     else:
         print("Get item: " + item_name)
 
-    formatted_price_jpy, shipping_fee_tag, sold_out_flag = parseMercariFormattedPrice(driver)
+    formatted_price_jpy, shipping_fee_tag, sold_out_flag = parseMercariFormattedPrice(
+        driver)
     if (item_name is None or img_url is None or formatted_price_jpy is None or shipping_fee_tag is None):
         print("failed to parse webpage")
         return model
 
     driver.quit()
 
-    formatted_final_price_cny = calculatorUtils.calculateFinalCNYPrice(formatted_price_jpy)
+    formatted_final_price_cny = calculatorUtils.calculateFinalCNYPrice(
+        formatted_price_jpy)
 
     model.price_jpy = f"¥{formatted_price_jpy}"
     model.price_cny = f"¥{formatted_final_price_cny}"
@@ -50,12 +54,13 @@ def calculateMercariPrice(request, url):
     model.sold_out_flag = sold_out_flag
     return model
 
+
 def parseMercariFormattedPrice(driver):
     price = driver.find_element_by_xpath(
         "//mer-price[@data-testid='price']").text
     print("price:" + price)
     item_type = driver.find_element_by_xpath(
-        "//mer-text/span").get_attribute("innerHTML")
+        "//mer-text[@type='caption']").get_attribute("innerHTML")
     print("type: " + item_type)
     sold_out_element = driver.find_element_by_xpath(
         "//mer-button[@data-testid='checkout-button']/button").get_attribute("innerHTML")
@@ -75,8 +80,10 @@ def parseMercariFormattedPrice(driver):
 
     return int(formatted_price), shipping_fee_tag, sold_out_flag
 
+
 def parseMercariMetadata(driver):
-    item_name = driver.find_element_by_xpath("//mer-heading[@class='mer-spacing-b-2']").text
+    item_name = driver.find_element_by_xpath(
+        "//mer-heading[@class='mer-spacing-b-2']").text
     # print("item_name: " + item_name)
     img_url = driver.find_element_by_xpath(
         "//mer-item-thumbnail[@data-testid='image-0']").get_attribute('src')
